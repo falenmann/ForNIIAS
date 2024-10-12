@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "WagonService";
+
+package wagons;
+
+service WagonsService
+{
+  rpc GetWagons(WagonRequest) returns (WagonResponse);
+}
+
+message WagonRequest
+{
+  string StartTime = 1;
+  string EndTime = 2;
+}
+
+message WagonResponse
+{
+  repeated Wagon Wagons = 1;
+}
+
+message Wagon
+{
+  string InventoryNumber = 1;
+  string ArrivalTime = 2;
+  string DepartureTime = 3;
+}

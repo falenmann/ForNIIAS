@@ -1,0 +1,2 @@
+obj\Debug\net6.0\Protos/Wagons.cs \
+obj\Debug\net6.0\Protos/WagonsGrpc.cs: Protos/wagons.proto
