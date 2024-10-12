@@ -49,14 +49,13 @@ public class WagonsService : WagonService.WagonsService.WagonsServiceBase
                     DepartureTime = res.dep.Time.ToString("yyyy-MM-dd HH:mm:ss")
                 })
                 .ToListAsync();
-
-            // Создаём объект WagonResponse и заполняем его
+            
             var response = new WagonResponse
             {
-                Wagons = { wagons } // Добавляем список вагонов в ответ
+                Wagons = { wagons } 
             };
 
-            return response; // Возвращаем ответ
+            return response; 
         }
         catch (Exception ex)
         {
