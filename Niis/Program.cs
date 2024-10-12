@@ -1,6 +1,8 @@
 using Niis;
 using Niis.Services;
 using Microsoft.EntityFrameworkCore;
+using WagonService;
+using WagonsService = Niis.Services.WagonsService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddGrpc();
 builder.Services.AddDbContext<PostgresDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
+builder.Services.AddScoped<WagonsService>();
 
 var app = builder.Build();
 
