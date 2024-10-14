@@ -31,64 +31,51 @@ public class WagonsService : WagonService.WagonsService.WagonsServiceBase
 
         try
         {
-            // 1. Выполняем запрос и загружаем данные
-            var wagonsRaw = await _dbContext.EventDeparture
-                .GroupJoin(_dbContext.EventSub,
-                    ed => ed.IdPath,
-                    es => es.IdPath,
-                    (ed, esGroup) => new { ed, esGroup })
-                .SelectMany(
-                    x => x.esGroup.DefaultIfEmpty(),
-                    (x, es) => new { x.ed, es })
-                .GroupJoin(_dbContext.EpcEvent,
-                    temp => temp.ed.IdPath,
-                    ee => ee.IdPath,
-                    (temp, eeGroup) => new { temp.ed, temp.es, eeGroup })
-                .SelectMany(
-                    x => x.eeGroup.DefaultIfEmpty(),
-                    (x, ee) => new { x.ed, x.es, ee })
-                .GroupJoin(_dbContext.Epc,
-                    temp => temp.ee.IdEpc,
-                    e => e.Id,
-                    (temp, eGroup) => new { temp.ed, temp.es, temp.ee, eGroup })
-                .SelectMany(
-                    x => x.eGroup.DefaultIfEmpty(),
-                    (x, e) => new { x.ed, x.es, x.ee, e })
-                .GroupJoin(_dbContext.EventAdd,
-                    temp => temp.ed.IdPath,
-                    ea => ea.IdPath,
-                    (temp, eaGroup) => new { temp.ed, temp.es, temp.ee, temp.e, eaGroup })
-                .SelectMany(
-                    x => x.eaGroup.DefaultIfEmpty(),
-                    (x, ea) => new { x.ed, x.es, x.ee, x.e, ea })
-                .GroupJoin(_dbContext.EventArrival,
-                    temp => temp.ea.IdPath,
-                    a => a.IdPath,
-                    (temp, aGroup) => new { temp.ed, temp.es, temp.ee, temp.e, temp.ea, aGroup })
-                .SelectMany(
-                    x => x.aGroup.DefaultIfEmpty(),
-                    (x, a) => new { x.ed, x.e, x.ea })
-                .Where(x => x.ed.Time >= startTime
-                            && x.ed.Time <= endTime && x.e.Number != "00000000")
-                .Select(x => new Wagon
-                {
-                    InventoryNumber = x.e.Number,
-                    ArrivalTime = x.ea.Time.ToLongTimeString(),  // ISO 8601 формат
-                    DepartureTime = x.ed.Time.ToLongTimeString()  // ISO 8601 формат
-                })
-                .Distinct()
-                .ToListAsync();
-            
+            var wagonsRaw = await (
+                    from departure in _dbContext.EventDeparture
+                    join epcEvent in _dbContext.EpcEvent on 
+                        new { departure.IdPath, Time = departure.Time } 
+                        equals 
+                        new { epcEvent.IdPath, epcEvent.Time } 
+                        into departureGroup
+                    from d in departureGroup
+                    join epc in _dbContext.Epc on d.IdEpc equals epc.Id
+                    where departure.Time >= startTime && departure.Time <= endTime
+                                                      && epc.Number != "00000000"
+                    select new
+                    {
+                        InventoryNumber = epc.Number,
+                        DepartureTime = departure.Time,
+                        DeparturePath = departure.IdPath
+                    }
+                ).SelectMany(departure => (
+                    from arrival in _dbContext.EventArrival
+                    where arrival.Time <= departure.DepartureTime
+                          && arrival.IdPath != departure.DeparturePath
+                          && arrival.Time >= startTime
+                    orderby arrival.Time descending
+                    select new
+                    {
+                        departure.InventoryNumber,
+                        ArrivalTime = arrival.Time,
+                        departure.DepartureTime
+                    })).ToListAsync();
            
 
-
-
-
+            
+            var wagonsList = wagonsRaw.Select(w => new WagonService.Wagon
+            {
+                InventoryNumber = w.InventoryNumber,
+                ArrivalTime = w.ArrivalTime.ToString("yyyy-MM-dd HH:mm:ss"), 
+                DepartureTime = w.DepartureTime.ToString("yyyy-MM-dd HH:mm:ss") 
+            }).ToList();
             
             var response = new WagonResponse
             {
-                Wagons = { wagonsRaw } 
+                Wagons = { wagonsList }
             };
+
+            return response;
 
             return response; 
         }
