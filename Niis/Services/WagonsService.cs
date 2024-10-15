@@ -31,53 +31,35 @@ public class WagonsService : WagonService.WagonsService.WagonsServiceBase
 
         try
         {
-            var wagonsRaw = await (
-                    from departure in _dbContext.EventDeparture
-                    join epcEvent in _dbContext.EpcEvent on 
-                        new { departure.IdPath, Time = departure.Time } 
-                        equals 
-                        new { epcEvent.IdPath, epcEvent.Time } 
-                        into departureGroup
-                    from d in departureGroup
-                    join epc in _dbContext.Epc on d.IdEpc equals epc.Id
-                    where departure.Time >= startTime && departure.Time <= endTime
-                                                      && epc.Number != "00000000"
-                    select new
-                    {
-                        InventoryNumber = epc.Number,
-                        DepartureTime = departure.Time,
-                        DeparturePath = departure.IdPath
-                    }
-                ).SelectMany(departure => (
-                    from arrival in _dbContext.EventArrival
-                    where arrival.Time <= departure.DepartureTime
-                          && arrival.IdPath != departure.DeparturePath
-                          && arrival.Time >= startTime
-                    orderby arrival.Time descending
-                    select new
-                    {
-                        departure.InventoryNumber,
-                        ArrivalTime = arrival.Time,
-                        departure.DepartureTime
-                    })).ToListAsync();
-           
+            // тут должен быть linq 
+            var wagonsList = await (
+                from epc in _dbContext.Epc
+                join epcEvent in _dbContext.EpcEvent on epc.Id equals epcEvent.IdEpc
+                where epc.Number != "00000000"
+                      && epcEvent.Time >= startTime
+                      && epcEvent.Time <= endTime
+                let eventOrder = _dbContext.EpcEvent
+                    .Where(e => e.IdEpc == epc.Id)
+                    .OrderBy(e => e.Time)
+                    .Select((e, index) => new { e, EventOrder = index + 1 })
+                from e_arr in eventOrder
+                from e_dep in eventOrder
+                where e_arr.e.Type == 0
+                      && e_dep.e.Type == 1
+                      && e_arr.EventOrder == e_dep.EventOrder - 1
+                orderby e_arr.e.IdEpc, e_arr.e.Time
+                select new Wagon
+                {
+                    InventoryNumber = epc.Number,
+                    ArrivalTime = e_arr.e.Time.ToString("yyyy-MM-dd HH:mm:ss"),
+                    DepartureTime = e_dep.e.Time.ToString("yyyy-MM-dd HH:mm:ss")
+                }).ToListAsync();
 
-            
-            var wagonsList = wagonsRaw.Select(w => new WagonService.Wagon
-            {
-                InventoryNumber = w.InventoryNumber,
-                ArrivalTime = w.ArrivalTime.ToString("yyyy-MM-dd HH:mm:ss"), 
-                DepartureTime = w.DepartureTime.ToString("yyyy-MM-dd HH:mm:ss") 
-            }).ToList();
-            
-            var response = new WagonResponse
+            return new WagonResponse
             {
                 Wagons = { wagonsList }
             };
-
-            return response;
-
-            return response; 
+            
         }
         catch (Exception ex)
         {
