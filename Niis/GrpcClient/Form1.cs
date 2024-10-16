@@ -37,7 +37,7 @@ namespace GrpcClient
                 try
                 {
                     var response = await client.GetWagonsAsync(request);
-                    resultsDataGridView.Rows.Clear(); /
+                    resultsDataGridView.Rows.Clear();
 
                     foreach (var wagon in response.Wagons)
                     {
