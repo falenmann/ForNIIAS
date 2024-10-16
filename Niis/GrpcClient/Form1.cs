@@ -37,14 +37,14 @@ namespace GrpcClient
                 try
                 {
                     var response = await client.GetWagonsAsync(request);
-                    resultsDataGridView.Rows.Clear(); // Очищаем предыдущие данные
+                    resultsDataGridView.Rows.Clear(); /
 
                     foreach (var wagon in response.Wagons)
                     {
-                        // Добавляем строки с данными о вагонах
+                        
                         resultsDataGridView.Rows.Add(
                             wagon.InventoryNumber,
-                            DateTime.Parse(wagon.ArrivalTime).ToString("yyyy-MM-dd HH:mm:ss"), // Форматируем дату
+                            DateTime.Parse(wagon.ArrivalTime).ToString("yyyy-MM-dd HH:mm:ss"), 
                             DateTime.Parse(wagon.DepartureTime).ToString("yyyy-MM-dd HH:mm:ss")
                         );
                     }
