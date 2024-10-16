@@ -1,7 +1,6 @@
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using System.Linq;
 using WagonService;
 
 namespace Niis.Services;
@@ -31,7 +30,7 @@ public class WagonsService : WagonService.WagonsService.WagonsServiceBase
 
         try
         {
-// Находим все события для вагонов в указанном диапазоне по времени
+
             var events = await (
                 from epc in _dbContext.Epc
                 join epcEvent in _dbContext.EpcEvent on epc.Id equals epcEvent.IdEpc
@@ -43,8 +42,7 @@ public class WagonsService : WagonService.WagonsService.WagonsServiceBase
                     epcEvent.Time,
                     epcEvent.Type
                 }).ToListAsync();
-
-// Пронумеровываем события для каждой группы вагонов
+            
             var orderedEvents = events
                 .GroupBy(e => e.Number)
                 .SelectMany(g => g
@@ -54,28 +52,26 @@ public class WagonsService : WagonService.WagonsService.WagonsServiceBase
                         e.Number,
                         e.Time,
                         e.Type,
-                        EventOrder = index + 1 // аналог ROW_NUMBER()
+                        EventOrder = index + 1 
                     })
                 ).ToList();
-
-// Находим отправления в указанном диапазоне, и ищем к ним соответствующие прибытия
+            
             var wagonsList = (
                 from eDep in orderedEvents
                 join eArr in orderedEvents on eDep.Number equals eArr.Number
                 where eDep.Type == 1 // Departure type
                       && eArr.Type == 0 // Arrival type
-                      && eDep.Time >= startTime // Проверяем только по времени отправления
+                      && eDep.Time >= startTime 
                       && eDep.Time <= endTime
-                      && eArr.EventOrder == eDep.EventOrder - 1 // Учитываем только прибытие перед отправлением
+                      && eArr.EventOrder == eDep.EventOrder - 1 
                 orderby eDep.Number, eDep.Time
                 select new Wagon
                 {
-                    InventoryNumber = eArr.Number, // Используем номер вагона
-                    ArrivalTime = eArr.Time.ToString("yyyy-MM-dd HH:mm:ss"), // Время прибытия (до отправления)
-                    DepartureTime = eDep.Time.ToString("yyyy-MM-dd HH:mm:ss") // Время отправления
+                    InventoryNumber = eArr.Number, 
+                    ArrivalTime = eArr.Time.ToString("yyyy-MM-dd HH:mm:ss"),
+                    DepartureTime = eDep.Time.ToString("yyyy-MM-dd HH:mm:ss") 
                 }).ToList();
-
-// Возвращаем результат
+            
             return new WagonResponse
             {
                 Wagons = { wagonsList }
