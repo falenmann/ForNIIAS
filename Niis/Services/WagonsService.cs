@@ -31,13 +31,12 @@ public class WagonsService : WagonService.WagonsService.WagonsServiceBase
 
         try
         {
+// Находим все события для вагонов в указанном диапазоне по времени
             var events = await (
                 from epc in _dbContext.Epc
                 join epcEvent in _dbContext.EpcEvent on epc.Id equals epcEvent.IdEpc
                 where epc.Number != "00000000"
-                      && epcEvent.Time >= startTime
-                      && epcEvent.Time <= endTime && epc.Type == 1
-                orderby epcEvent.Time
+                orderby epc.Number, epcEvent.Time
                 select new
                 {
                     epc.Number,
@@ -45,6 +44,7 @@ public class WagonsService : WagonService.WagonsService.WagonsServiceBase
                     epcEvent.Type
                 }).ToListAsync();
 
+// Пронумеровываем события для каждой группы вагонов
             var orderedEvents = events
                 .GroupBy(e => e.Number)
                 .SelectMany(g => g
@@ -54,30 +54,33 @@ public class WagonsService : WagonService.WagonsService.WagonsServiceBase
                         e.Number,
                         e.Time,
                         e.Type,
-                        EventOrder = index + 1
+                        EventOrder = index + 1 // аналог ROW_NUMBER()
                     })
                 ).ToList();
 
+// Находим отправления в указанном диапазоне, и ищем к ним соответствующие прибытия
             var wagonsList = (
-                from eArr in orderedEvents
-                join eDep in orderedEvents on eArr.Number equals eDep.Number
-                where eArr.Type == 0 // Arrival type
-                      && eDep.Type == 1 // Departure type
-                      && eArr.EventOrder == eDep.EventOrder - 1
-                orderby eArr.Number, eArr.Time
+                from eDep in orderedEvents
+                join eArr in orderedEvents on eDep.Number equals eArr.Number
+                where eDep.Type == 1 // Departure type
+                      && eArr.Type == 0 // Arrival type
+                      && eDep.Time >= startTime // Проверяем только по времени отправления
+                      && eDep.Time <= endTime
+                      && eArr.EventOrder == eDep.EventOrder - 1 // Учитываем только прибытие перед отправлением
+                orderby eDep.Number, eDep.Time
                 select new Wagon
                 {
-                    InventoryNumber = eArr.Number,
-                    ArrivalTime = eArr.Time.ToString("yyyy-MM-dd HH:mm:ss"),
-                    DepartureTime = eDep.Time.ToString("yyyy-MM-dd HH:mm:ss")
+                    InventoryNumber = eArr.Number, // Используем номер вагона
+                    ArrivalTime = eArr.Time.ToString("yyyy-MM-dd HH:mm:ss"), // Время прибытия (до отправления)
+                    DepartureTime = eDep.Time.ToString("yyyy-MM-dd HH:mm:ss") // Время отправления
                 }).ToList();
 
+// Возвращаем результат
             return new WagonResponse
             {
                 Wagons = { wagonsList }
             };
 
-            
         }
         catch (Exception ex)
         {
