@@ -1,6 +1,4 @@
 using Grpc.Net.Client;
-using System;
-using System.Windows.Forms;
 using WagonService;
 
 namespace GrpcClient
@@ -10,6 +8,7 @@ namespace GrpcClient
         public Form1()
         {
             InitializeComponent();
+            InitializeDataGridView(); 
         }
         
         private async void submitButton_Click(object sender, EventArgs e)
@@ -17,8 +16,8 @@ namespace GrpcClient
             string startTime = startTimeTextBox.Text;
             string endTime = endTimeTextBox.Text;
             
-            if (DateTime.TryParse(startTime, out DateTime startDateTime) &&
-                DateTime.TryParse(endTime, out DateTime endDateTime))
+            if (DateTime.TryParse(startTime, out var startDateTime) &&
+                DateTime.TryParse(endTime, out var endDateTime))
             {
                 var handler = new HttpClientHandler();
                 handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
@@ -38,10 +37,16 @@ namespace GrpcClient
                 try
                 {
                     var response = await client.GetWagonsAsync(request);
-                    resultsDataGridView.Rows.Clear();
+                    resultsDataGridView.Rows.Clear(); // Очищаем предыдущие данные
+
                     foreach (var wagon in response.Wagons)
                     {
-                        resultsDataGridView.Rows.Add(wagon.InventoryNumber, wagon.ArrivalTime, wagon.DepartureTime);
+                        // Добавляем строки с данными о вагонах
+                        resultsDataGridView.Rows.Add(
+                            wagon.InventoryNumber,
+                            DateTime.Parse(wagon.ArrivalTime).ToString("yyyy-MM-dd HH:mm:ss"), // Форматируем дату
+                            DateTime.Parse(wagon.DepartureTime).ToString("yyyy-MM-dd HH:mm:ss")
+                        );
                     }
                 }
                 catch (Exception ex)
@@ -53,6 +58,17 @@ namespace GrpcClient
             {
                 MessageBox.Show("Некорректный формат времени. Введите корректные данные.");
             }
+        }
+        private void InitializeDataGridView()
+        {
+            resultsDataGridView.ColumnCount = 3; 
+            resultsDataGridView.Columns[0].Name = "Инвентарный номер"; 
+            resultsDataGridView.Columns[1].Name = "Время прибытия";    
+            resultsDataGridView.Columns[2].Name = "Время отправления"; 
+
+            resultsDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill; 
+            resultsDataGridView.AllowUserToAddRows = false; 
+            resultsDataGridView.ScrollBars = ScrollBars.Both; 
         }
     }
 }

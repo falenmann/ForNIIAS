@@ -6,21 +6,16 @@ namespace Niis;
 public class PostgresDbContext : DbContext
 {
     public PostgresDbContext(DbContextOptions<PostgresDbContext> options) : base(options) {}
-
-    /*protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseNpgsql()
-    }*/
-
-    public DbSet<Parks> Park { get; set; }
-    public DbSet<Paths> Path { get; set; }
-    public DbSet<Epcs> Epc { get; set; }
-    public DbSet<EpcEvents> EpcEvent { get; set; }
-    public DbSet<EventArrivals> EventArrival { get; set; }
-    public DbSet<EventDepartures> EventDeparture { get; set; }
-    public DbSet<EventAdds> EventAdd { get; set; }
-    public DbSet<EventSubs> EventSub { get; set; }
     
+    public DbSet<Parks> Park { get; set; } = null!;
+    public DbSet<Paths> Path { get; set; } = null!;
+    public DbSet<Epcs> Epc { get; set; } = null!;
+    public DbSet<EpcEvents> EpcEvent { get; set; } = null!;
+    public DbSet<EventArrivals> EventArrival { get; set; } = null!;
+    public DbSet<EventDepartures> EventDeparture { get; set; } = null!;
+    public DbSet<EventAdds> EventAdd { get; set; } = null!;
+    public DbSet<EventSubs> EventSub { get; set; } = null!;
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,7 +28,7 @@ public class PostgresDbContext : DbContext
         var nullableDateTimeConverter = new ValueConverter<DateTime?, DateTime?>(
             v => v.HasValue && v.Value.Kind == DateTimeKind.Unspecified
                 ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
-                : v.Value.ToUniversalTime(),
+                : v!.Value.ToUniversalTime(),
             v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v
         );
         

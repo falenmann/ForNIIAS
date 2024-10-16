@@ -1,7 +1,6 @@
 using Niis;
 using Niis.Services;
 using Microsoft.EntityFrameworkCore;
-using WagonService;
 using WagonsService = Niis.Services.WagonsService;
 
 var builder = WebApplication.CreateBuilder(args);
