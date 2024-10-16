@@ -36,7 +36,7 @@ public class WagonsService : WagonService.WagonsService.WagonsServiceBase
                 join epcEvent in _dbContext.EpcEvent on epc.Id equals epcEvent.IdEpc
                 where epc.Number != "00000000"
                       && epcEvent.Time >= startTime
-                      && epcEvent.Time <= endTime
+                      && epcEvent.Time <= endTime && epc.Type == 1
                 orderby epcEvent.Time
                 select new
                 {
