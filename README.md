@@ -28,8 +28,7 @@ To work, the database has the following structure and keys:
 
 
 
-Parks table
-Stores information about parks.
+*Parks table. Stores information about parks.*
 
 ·Id - unique park identifier.
 
@@ -43,8 +42,7 @@ Stores information about parks.
 
 
 
-IPaths table
-Stores information about paths in the park.
+*IPaths table Stores information about paths in the park.*
 
 ·Id - unique path identifier.
 
@@ -54,8 +52,7 @@ Stores information about paths in the park.
 
 
 
-Table Epcs
-Stores information about rolling stock units (cars).
+*Table Epcs Stores information about rolling stock units (cars).*
 
 ·Id - unique identifier of the unit.
 
@@ -65,8 +62,7 @@ Stores information about rolling stock units (cars).
 
 
 
-Table EpcEvents
-Stores events related to rolling stock units.
+*Table EpcEvents Stores events related to rolling stock units.*
 
 ·Time - event time.
 
@@ -80,8 +76,7 @@ Stores events related to rolling stock units.
 
 
 
-EventArrivals table
-Stores information about train arrival events.
+*EventArrivals table Stores information about train arrival events.*
 
 ·Time - arrival time.
 
@@ -93,8 +88,7 @@ Stores information about train arrival events.
 
 
 
-EventDepartures table
-Stores information about train departure events.
+*EventDepartures table Stores information about train departure events.*
 
 ·Time - departure time.
 
@@ -106,8 +100,7 @@ Stores information about train departure events.
 
 
 
-EventAdds table
-Stores information about adding cars to the track.
+*EventAdds table Stores information about adding cars to the track.*
 
 ·Time - time of adding.
 
@@ -117,8 +110,7 @@ Stores information about adding cars to the track.
 
 
 
-EventSubs table
-Stores information about the removal of cars from the track.
+*EventSubs table Stores information about the removal of cars from the track.*
 
 ·Time - time of removal.
 
