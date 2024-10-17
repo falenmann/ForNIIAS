@@ -32,9 +32,13 @@ Parks table
 Stores information about parks.
 
 ·Id - unique park identifier.
+
 ·Name - park name.
+
 ·AsuNumber - ACS (Automated Control System) number.
+
 ·Type - park type.
+
 ·Direction - direction of movement.
 
 
@@ -43,7 +47,9 @@ IPaths table
 Stores information about paths in the park.
 
 ·Id - unique path identifier.
+
 ·AsuNumber - ASU number of the path.
+
 ·IdPark - identifier of the park to which the path belongs.
 
 
@@ -52,7 +58,9 @@ Table Epcs
 Stores information about rolling stock units (cars).
 
 ·Id - unique identifier of the unit.
+
 ·Number - inventory number of the unit.
+
 ·Type - type of rolling stock (for example, type of car).
 
 
@@ -61,9 +69,13 @@ Table EpcEvents
 Stores events related to rolling stock units.
 
 ·Time - event time.
+
 ·IdPath - path identifier to which the event is related.
+
 ·Type - event type (e.g. arrival, departure, etc.).
+
 ·NumberInOrder - number in the event sequence.
+
 ·IdEpc - rolling stock unit identifier.
 
 
@@ -72,8 +84,11 @@ EventArrivals table
 Stores information about train arrival events.
 
 ·Time - arrival time.
+
 ·IdPath - identifier of the path where the train arrived.
+
 ·TrainNumber - train number.
+
 ·TrainIndex - train index.
 
 
@@ -82,8 +97,11 @@ EventDepartures table
 Stores information about train departure events.
 
 ·Time - departure time.
+
 ·IdPath - identifier of the track from which the train departed.
+
 ·TrainNumber - train number.
+
 ·TrainIndex - train index.
 
 
@@ -92,7 +110,9 @@ EventAdds table
 Stores information about adding cars to the track.
 
 ·Time - time of adding.
+
 ·IdPath - identifier of the track to which the car is added.
+
 ·Direction - direction of movement.
 
 
@@ -101,7 +121,9 @@ EventSubs table
 Stores information about the removal of cars from the track.
 
 ·Time - time of removal.
+
 ·IdPath - identifier of the track from which the car is removed.
+
 ·Direction - direction of movement.
 
 
