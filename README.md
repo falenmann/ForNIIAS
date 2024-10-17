@@ -27,60 +27,83 @@ To work, the database has the following structure and keys:
 ![image](https://github.com/user-attachments/assets/598b2384-9b8b-4e1d-828c-8e8736f184f3)
 
 
+
 Parks table
 Stores information about parks.
 
-Id - unique identifier of the park.
-Name - name of the park.
-AsuNumber - ACS (Automated Control System) number.
-Type - type of park.
-Direction - direction of travel.
-Paths table
+·Id - unique park identifier.
+·Name - park name.
+·AsuNumber - ACS (Automated Control System) number.
+·Type - park type.
+·Direction - direction of movement.
+
+
+
+IPaths table
 Stores information about paths in the park.
 
-Id - unique identifier of the path.
-AsuNumber - ACS number of the path.
-IdPark - identifier of the park to which the path belongs.
-Epcs table
+·Id - unique path identifier.
+·AsuNumber - ASU number of the path.
+·IdPark - identifier of the park to which the path belongs.
+
+
+
+Table Epcs
 Stores information about rolling stock units (cars).
 
-Id - unique identifier of the unit.
-Number - inventory number of the unit.
-Type - type of rolling stock (for example, type of car).
-EpcEvents table
-Stores events associated with rolling stock units.
+·Id - unique identifier of the unit.
+·Number - inventory number of the unit.
+·Type - type of rolling stock (for example, type of car).
 
-Time - time of the event.
-IdPath - identifier of the path to which the event is associated.
-Type - type of event (for example, arrival, departure, etc.).
-NumberInOrder - number in the sequence of events.
-IdEpc - rolling stock unit identifier.
+
+
+Table EpcEvents
+Stores events related to rolling stock units.
+
+·Time - event time.
+·IdPath - path identifier to which the event is related.
+·Type - event type (e.g. arrival, departure, etc.).
+·NumberInOrder - number in the event sequence.
+·IdEpc - rolling stock unit identifier.
+
+
+
 EventArrivals table
 Stores information about train arrival events.
 
-Time - arrival time.
-IdPath - track identifier where the train arrived.
-TrainNumber - train number.
-TrainIndex - train index.
+·Time - arrival time.
+·IdPath - identifier of the path where the train arrived.
+·TrainNumber - train number.
+·TrainIndex - train index.
+
+
+
 EventDepartures table
 Stores information about train departure events.
 
-Time - departure time.
-IdPath - track identifier where the train departed.
-TrainNumber - train number.
-TrainIndex - train index.
+·Time - departure time.
+·IdPath - identifier of the track from which the train departed.
+·TrainNumber - train number.
+·TrainIndex - train index.
+
+
+
 EventAdds table
 Stores information about adding cars to the track.
 
-Time - adding time.
-IdPath - track identifier where the car is added.
-Direction - direction of travel.
-EventSubs table
-Stores information about removing cars from the track.
+·Time - time of adding.
+·IdPath - identifier of the track to which the car is added.
+·Direction - direction of movement.
 
-Time - removing time.
-IdPath - track identifier where the car is removed.
-Direction - direction of travel.
+
+
+EventSubs table
+Stores information about the removal of cars from the track.
+
+·Time - time of removal.
+·IdPath - identifier of the track from which the car is removed.
+·Direction - direction of movement.
+
 
 
 
